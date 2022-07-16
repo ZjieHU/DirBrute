@@ -161,7 +161,7 @@ if __name__ == "__main__":
                 line = line.replace('\r', '').replace('\n', '')
                 if len(line) > 0 and domains.count(line) == 0:
                     domains.append(line)
-                    fuzz_start(sys.argv[1], options.ext)
+                    fuzz_start(line, options.ext)
             fp.close()
         else:
             fuzz_start(sys.argv[1], options.ext)
