@@ -19,6 +19,10 @@ import Queue
 import optparse
 import re
 import requests
+import sys
+
+sys.getdefaultencoding()
+sys.setdefaultencoding('utf8')
 
 # 全局配置
 domain_filename = '' #要爆破的域名文件
