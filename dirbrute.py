@@ -40,6 +40,7 @@ proxies = {  # 代理配置
 
 def outFile(filename, content):
     fp = open(filename, 'a')
+    content = content.replace('\r', '').replace('\n', '')
     fp.write(content+'\n')
     fp.close()
 
@@ -105,7 +106,7 @@ def fuzz_start(siteurl, file_ext):
         if check_https(tmp_url):
             urls.append(tmp_url)
     print urls
-    
+
     for siteurl in urls:
 
         # 检查waf是否存在
