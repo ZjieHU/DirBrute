@@ -20,6 +20,7 @@ import optparse
 import requests
 
 # 全局配置
+domain_filename = '' #要爆破的域名文件
 using_dic = ''  # 使用的字典文件
 threads_count = 1  # 线程数
 timeout = 3  # 超时时间
@@ -136,6 +137,9 @@ if __name__ == "__main__":
     parser.add_option('-e', '--ext', dest='ext',
                       default='html', type='string',
                       help='Choose the extension: php asp aspx jsp...')
+    parser.add_option('-f', '--file', dest='file',
+                      default='', type='string',
+                      help='Choose the domain filename')
     parser.add_option('-t', '--threads', dest='threads_num',
                       default=10, type='int',
                       help='Number of threads. default = 10')
@@ -147,8 +151,20 @@ if __name__ == "__main__":
         using_dic = options.dic_path
     if options.threads_num:
         threads_count = options.threads_num
+    if options.file:
+        domain_filename = options.file
     if len(sys.argv) > 1:
-        fuzz_start(sys.argv[1], options.ext)
+        if domain_filename != '':
+            domains = []
+            fp = open(domain_filename, 'rb')
+            for line in fp:
+                line = line.replace('\r', '').replace('\n', '')
+                if len(line) > 0 and domains.count(line) == 0:
+                    domains.append(line)
+                    fuzz_start(sys.argv[1], options.ext)
+            fp.close()
+        else:
+            fuzz_start(sys.argv[1], options.ext)
     else:
         parser.print_help()
         sys.exit(0)
