@@ -110,7 +110,7 @@ def fuzz_start(siteurl, file_ext):
     for siteurl in urls:
 
         # 检查waf是否存在
-        checkWaf(url=siteurl, header=headers, proxy=proxies, timeout=timeout, allow_redirects=allow_redirects)
+        #checkWaf(url=siteurl, header=headers, proxy=proxies, timeout=timeout, allow_redirects=allow_redirects)
 
         global dir_exists
         dir_exists = []
