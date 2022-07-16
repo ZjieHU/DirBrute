@@ -17,6 +17,7 @@ from libs.checkWAF import checkWaf
 import threading
 import Queue
 import optparse
+import re
 import requests
 
 # 全局配置
@@ -35,6 +36,12 @@ proxies = {  # 代理配置
     # "https": "http://10.10.1.10:1080",
     # "http": "http://127.0.0.1:8118", # TOR 洋葱路由器
 }
+
+
+def outFile(filename, content):
+    fp = open(filename, 'a')
+    fp.write(content+'\n')
+    fp.close()
 
 
 def dir_check(url):
@@ -59,8 +66,15 @@ class WyWorker(threading.Thread):
                 results = dir_check(url)
                 if results.status_code == requests2.codes.ok:
                     dir_exists.append(url)
+                    title = ''
+                    regx = '<title>(.*?)</title>'
+                    objs = re.findall(regx, results.text)
+                    for obj in objs:
+                        title = title +','+ obj
+                    title = title[0:-1]
                     # print results.status_code
-                    msg = "[%s]:%s \n" % (results.status_code, results.url)
+                    msg = "[%s]:%s:%s \n" % (results.status_code, results.url, title)
+                    outFile('result.txt', msg)
                     self.output.printInLine(msg)
             except Exception, e:
                 print e  # 队列阻塞
@@ -91,7 +105,7 @@ def fuzz_start(siteurl, file_ext):
         if check_https(tmp_url):
             urls.append(tmp_url)
     print urls
-    
+
     for siteurl in urls:
 
         # 检查waf是否存在
