@@ -91,7 +91,7 @@ def fuzz_start(siteurl, file_ext):
         if check_https(tmp_url):
             urls.append(tmp_url)
     print urls
-
+    
     for siteurl in urls:
 
         # 检查waf是否存在
@@ -108,10 +108,10 @@ def fuzz_start(siteurl, file_ext):
             queue.put(line)
 
 
-    output.printHeader('-' * 60)
-    output.printTarget(siteurl)
-    output.printConfig(file_ext, str(threads_count), str(queue.qsize()))
-    output.printHeader('-' * 60)
+        output.printHeader('-' * 60)
+        output.printTarget(siteurl)
+        output.printConfig(file_ext, str(threads_count), str(queue.qsize()))
+        output.printHeader('-' * 60)
 
     # 初始化线程组
     threads = []
