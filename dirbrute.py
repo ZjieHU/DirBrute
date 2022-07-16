@@ -10,13 +10,14 @@
 		* 线程组遍历，使每个独立的线程join()，等待主线程退出后，再进入主进程
 '''
 
-import libs.requests as requests
+import libs.requests as requests2
 from libs.output import *
 from libs.utils.FileUtils import FileUtils
 from libs.checkWAF import checkWaf
 import threading
 import Queue
 import optparse
+import requests
 
 # 全局配置
 using_dic = ''  # 使用的字典文件
@@ -36,7 +37,7 @@ proxies = {  # 代理配置
 
 
 def dir_check(url):
-    return requests.get(url, stream=True, headers=headers, timeout=timeout, proxies=proxies,
+    return requests2.get(url, stream=True, headers=headers, timeout=timeout, proxies=proxies,
                         allow_redirects=allow_redirects)
 
 
@@ -55,7 +56,7 @@ class WyWorker(threading.Thread):
             try:
                 url = self.queue.get_nowait()
                 results = dir_check(url)
-                if results.status_code == requests.codes.ok:
+                if results.status_code == requests2.codes.ok:
                     dir_exists.append(url)
                     # print results.status_code
                     msg = "[%s]:%s \n" % (results.status_code, results.url)
@@ -65,24 +66,45 @@ class WyWorker(threading.Thread):
                 break
 
 
+def check_https(url):
+    global headers
+    try:
+        res = requests.head(url=url, timeout=30, headers=headers)
+        return True
+    except Exception, e:
+        print e
+        return False
+
+
 def fuzz_start(siteurl, file_ext):
     output = CLIOutput()
 
+    urls = []
     if not siteurl.startswith('http://'):
         siteurl = 'http://%s' % siteurl
+        if check_https(url):
+            urls.append(siteurl)
 
-    # 检查waf是否存在
-    checkWaf(url=siteurl, header=headers, proxy=proxies, timeout=timeout, allow_redirects=allow_redirects)
+    if not siteurl.startswith('https://'):
+        siteurl = 'https://%s' % siteurl
+        if check_https(url):
+            urls.append(siteurl)
 
-    global dir_exists
-    dir_exists = []
+    for siteurl in urls:
 
-    # 生成队列堆栈
-    queue = Queue.Queue()
+        # 检查waf是否存在
+        checkWaf(url=siteurl, header=headers, proxy=proxies, timeout=timeout, allow_redirects=allow_redirects)
 
-    for line in FileUtils.getLines(using_dic):
-        line = '%s/%s' % (siteurl.rstrip('/'), line.replace('%EXT%', file_ext))
-        queue.put(line)
+        global dir_exists
+        dir_exists = []
+
+        # 生成队列堆栈
+        queue = Queue.Queue()
+
+        for line in FileUtils.getLines(using_dic):
+            line = '%s/%s' % (siteurl.rstrip('/'), line.replace('%EXT%', file_ext))
+            queue.put(line)
+
 
     output.printHeader('-' * 60)
     output.printTarget(siteurl)
