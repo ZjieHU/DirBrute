@@ -89,6 +89,7 @@ def fuzz_start(siteurl, file_ext):
         siteurl = 'https://%s' % siteurl
         if check_https(siteurl):
             urls.append(siteurl)
+    print urls
 
     for siteurl in urls:
 
