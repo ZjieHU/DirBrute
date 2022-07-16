@@ -62,10 +62,10 @@ def checkWaf(url, header="", proxy="", timeout=5, allow_redirects=False):
         message = "are you sure that you want to \n"
         message += "continue with further fuzzing? [y/N] \n"
         CLIOutput().printNewLine(message)
-        output = raw_input()
-        if not output or output[0] not in ("Y", "y"):
-            print 'User Quit!'
-            sys.exit(0)
+        # output = raw_input()
+        # if not output or output[0] not in ("Y", "y"):
+            # print 'User Quit!'
+            # sys.exit(0)
 
     if retVal1:
         warnMsg = "heuristics detected that the target \n"
